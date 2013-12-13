@@ -6,6 +6,7 @@ Flip Graph Generator of a Convex Polygon
 Description
 ---
 fgg is for generating flip graphs of a convex n-gon.
+![heptagon](https://github.com/s-teramo/fgg/blob/master/heptagon-image.jpg)
 
 
 Required Library
