@@ -10,7 +10,7 @@ fgg is for generating flip graphs of a convex n-gon.
 
 Required Library
 ---
-Since fgg uses (http://igraph.sourceforge.net/ "igraph library"),
+Since fgg uses [igraph library](http://igraph.sourceforge.net/ "igraph library"),
 user has to install it.
 
 
