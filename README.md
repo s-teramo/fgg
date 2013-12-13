@@ -30,6 +30,7 @@ structure.
 Install
 ---
 We confirm fgg well-behaved at least on Mac 10.5.
+
 	cmake .
 	make
 	make install
