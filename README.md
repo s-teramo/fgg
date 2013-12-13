@@ -29,15 +29,21 @@ structure.
 
 Install
 ---
-We confirm fgg well-behaved at least on Mac 10.5.
+We confirm fgg well-behaved at least on Mac 10.5, and g++ 4.0.1.
 
 	cmake .
 	make
 	make install
 
 
+How to use fgg
+---
+We wrote simple examples in example directory.
+Documentation and comments of each function are now preparing.
 
 
 
+Thank you!!
+===
 
 
