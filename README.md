@@ -10,6 +10,8 @@ The following image is a flip graph of the regular heptagon.
 Each vertex is drawn with a triangulation of the heptagon.
 Vertices are connected by an edge (blue line),
 if they are transformed from a flip operation.
+fgg library is implemented by C++, and provides procedures for
+preparing some stuffs used in the following image.
 ![heptagon](heptagon-image.jpg)
 We have confirmed that fgg generates flip graphs correctly up to 15-gon.
 
@@ -27,8 +29,14 @@ structure.
 
 Install
 ---
+We confirm fgg well-behaved at least on Mac 10.5.
 	cmake .
 	make
 	make install
+
+
+
+
+
 
 
