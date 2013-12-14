@@ -19,7 +19,7 @@ We have confirmed that fgg generates flip graphs correctly up to 15-gon.
 Required Library
 ---
 Since fgg uses
-[igraph library](http://igraph.sourceforge.net/ "igraph library"),
+[igraph library](http://igraph.sourceforge.net/ "the igraph library"),
 user has to install it. 
 However, we consider other graph library, too.
 We may exchange graph library at some future dates,
@@ -29,11 +29,12 @@ structure.
 
 Install
 ---
-We confirm fgg well-behaved at least on Mac 10.5, and g++ 4.0.1.
+We confirm fgg well-behaved at least on Mac 10.5.8, g++ 4.0.1, and
+igraph 0.6.5.
 
-	cmake .
-	make
-	make install
+	$ cmake .
+	$ make
+	$ make install [optional]
 
 
 How to use fgg
