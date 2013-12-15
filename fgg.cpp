@@ -1,26 +1,37 @@
 #include "fgg.h"
-#include <cassert>
-#include <map>
-#include <stack>
-#include <iostream>
 #include <igraph/igraph.h>
-#include <cstdio>
+#include <cassert>
 #include <cmath>
-#include <sstream>
+#include <cstdio>
+#include <iostream>
 #include <iomanip>
+#include <map>
+#include <sstream>
+#include <stack>
 
 
+/** Constructor of flip_graph_generator. Initializing the number of
+ * polygon_vertex_count and vertex_count.
+ * @param n the number of vertices of a target convex polygon
+ */
 flip_graph_generator::flip_graph_generator(size_t n) :
 		polygon_vertex_count(n), vertex_count(0)
 {
 	assert(n > 2);
 }
 
+/** Destructor of flip_graph_generator. Just destroying igraph_t.
+ */
 flip_graph_generator::~flip_graph_generator()
 {
 	igraph_destroy(&flip_graph);
 }
 
+/** Generating a Davenport-Schinzel sequence which is used as 
+ * a seed of vertex-enumeration. Generated sequence is one of the
+ * simplest sequences, we think.
+ * @return string data of Davenport-Schinzel sequence
+ */
 std::string
 flip_graph_generator::get_init_dss()
 {
@@ -35,6 +46,10 @@ flip_graph_generator::get_init_dss()
 	return s;
 }
 
+/** Write given Davenport-Schinzel sequence to standard output.
+ * Since this method is just debug usage only, we define as private.
+ * @param dss string data storing Davenport-Schinzel sequence.
+ */
 void
 flip_graph_generator::print_dss(const std::string& dss) const
 {
@@ -44,6 +59,12 @@ flip_graph_generator::print_dss(const std::string& dss) const
 	std::cout << std::endl;
 }
 
+/** Split given Davenport-Schinzel sequence into polygon_vertex_count
+ * - 1 subsequences. Each subsequence is in decreasing order of
+ * alphabet.
+ * @param dss as an input Davenport-Schinzel sequence
+ * @param split_strings stored vector of strings of subsequences.
+ */
 void
 flip_graph_generator::split(const std::string& dss,
 		std::vector<std::string>& split_strings)
@@ -58,7 +79,15 @@ flip_graph_generator::split(const std::string& dss,
 	}
 	split_strings.push_back(dss.substr(head));
 }
-			
+
+/** Concatenate subsequences in order to generate a new
+ * Davenport-Schinzel sequence.
+ * @param splits is vector of splited Davenport-Schinzel sequence.
+ * @param swap_string1
+ * @param swap_pos1
+ * @param swap_string2
+ * @param swap_pos2
+ */
 std::string
 flip_graph_generator::concatenate(const std::vector<std::string>& splits,
 		const std::string& swap_string1, const size_t swap_pos1,
@@ -79,6 +108,9 @@ flip_graph_generator::concatenate(const std::vector<std::string>& splits,
 	return concat_string;
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::neighbor_dss_from_last_word(
 		std::vector<std::string>& neighbor_vec,
@@ -107,6 +139,9 @@ flip_graph_generator::neighbor_dss_from_last_word(
 			s1, ith_dec_seq, s2, swap_pos2));
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::neighbor_dss_from_not_last_word(
 		std::vector<std::string>& neighbor_vec,
@@ -137,6 +172,9 @@ flip_graph_generator::neighbor_dss_from_not_last_word(
 			s2, (unsigned) pred - 1, s1, ith_dec_seq));
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::get_neighbors(const std::string& dss, 
 		std::vector<std::string>& S) 
@@ -162,6 +200,9 @@ flip_graph_generator::get_neighbors(const std::string& dss,
 	}
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::build_flip_graph()
 {
@@ -179,6 +220,9 @@ flip_graph_generator::build_flip_graph()
 	igraph_vector_destroy(&E);
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::gen()
 {
@@ -225,6 +269,9 @@ flip_graph_generator::gen()
 	build_flip_graph();
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::write_triangulation_graph(size_t vertex_id) const
 {
@@ -249,6 +296,9 @@ flip_graph_generator::write_triangulation_graph(size_t vertex_id) const
 	igraph_destroy(&g);
 }
 
+/**
+ *
+ */
 void
 flip_graph_generator::save(const std::string& filename) const
 {
@@ -257,11 +307,20 @@ flip_graph_generator::save(const std::string& filename) const
 	fclose(fp);
 }
 
+/**
+ *
+ */
 void flip_graph_generator::get_flip_graph(igraph_t& g)
 {
 	g = flip_graph;
 }
 
+/** Get the vertex set of caliculated flip graph. The vertex set is
+ * represented as a vector of strings. Each index of vector is a id of
+ * vertex, and stored string is a Davenport-Schinzel sequence, which
+ * is able to decode to triangulation of convex polygons.
+ * @param v stored the vertex set.
+ */
 void flip_graph_generator::get_vertices(std::vector<std::string>& v)
 {
 	v = vertices;
