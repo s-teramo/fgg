@@ -1,7 +1,6 @@
 #include "fgg.h"
 #include <igraph/igraph.h>
 #include <iostream>
-#include <string>
 #include <cstdio>
 
 int
