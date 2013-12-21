@@ -1,12 +1,8 @@
 #include "fgg.h"
-#include <igraph/igraph.h>
 #include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <iostream>
-#include <iomanip>
-#include <map>
-#include <sstream>
 #include <stack>
 
 
@@ -20,16 +16,15 @@ flip_graph_generator::flip_graph_generator(size_t n) :
 	assert(n > 2);
 }
 
-/** Destructor of flip_graph_generator. Just destroying igraph_t.
+/** Destructor of flip_graph_generator. Nothing to do.
  */
 flip_graph_generator::~flip_graph_generator()
 {
-	igraph_destroy(&flip_graph);
 }
 
 /** Generating a Davenport-Schinzel sequence which is used as 
- * a seed of vertex-enumeration. Generated sequence is one of the
- * simplest sequences, we think.
+ * a seed of vertex-enumeration and flip graph generation.
+ * Generated sequence is one of the simplest sequences, we think.
  * @return string data of Davenport-Schinzel sequence
  */
 std::string
@@ -47,7 +42,7 @@ flip_graph_generator::get_init_dss()
 }
 
 /** Write given Davenport-Schinzel sequence to standard output.
- * Since this method is just debug usage only, we define as private.
+ * Since this method is just debug usage only, we specify as private.
  * @param dss string data storing Davenport-Schinzel sequence.
  */
 void
@@ -59,11 +54,10 @@ flip_graph_generator::print_dss(const std::string& dss) const
 	std::cout << std::endl;
 }
 
-/** Split given Davenport-Schinzel sequence into polygon_vertex_count
- * - 1 subsequences. Each subsequence is in decreasing order of
- * alphabet.
+/** Split given Davenport-Schinzel sequence into polygon_vertex_count - 1
+ * subsequences. Each subsequence is in decreasing order of alphabet.
  * @param dss as an input Davenport-Schinzel sequence
- * @param split_strings stored vector of strings of subsequences.
+ * @param split_strings stored vector of strings of subsequences
  */
 void
 flip_graph_generator::split(const std::string& dss,
@@ -204,26 +198,6 @@ flip_graph_generator::get_neighbors(const std::string& dss,
  *
  */
 void
-flip_graph_generator::build_flip_graph()
-{
-	igraph_vector_t E;
-	igraph_vector_init(&E, edges.size() * 2);
-	long int edge_count = 0;
-	std::vector<std::pair<size_t, size_t> >::iterator it;
-	for (it = edges.begin(); it != edges.end(); it++) {
-		VECTOR(E)[edge_count] = (*it).first;
-		VECTOR(E)[edge_count + 1] = (*it).second;
-		edge_count += 2;
-	}
-	igraph_empty(&flip_graph, vertices.size(), IGRAPH_UNDIRECTED);
-	igraph_add_edges(&flip_graph, &E, 0);
-	igraph_vector_destroy(&E);
-}
-
-/**
- *
- */
-void
 flip_graph_generator::gen()
 {
 	std::string init_dss = get_init_dss();
@@ -266,26 +240,29 @@ flip_graph_generator::gen()
 			}
 		}
 	}
-	build_flip_graph();
+//	build_flip_graph();
 }
 
 /**
  *
  */
 void
-flip_graph_generator::write_triangulation_graph(size_t vertex_id) const
+flip_graph_generator::get_triangulation_edges(const size_t& vertex_id,
+		std::vector<std::pair<size_t, size_t> >& t_edges) 
 {
-	igraph_t g;
-	igraph_empty(&g, vertex_count, IGRAPH_UNDIRECTED);
+	assert(vertices.size() != 0);
 	assert(vertex_id < vertices.size());
 	std::string s = vertices[vertex_id];
+	t_edges.clear();
 
 	for (size_t i = 1, si = 0; i < vertex_count; i++) {
 		for (; si < s.size(); si++) {
-			if ((unsigned) s[si] == i) break;
-			igraph_add_edge(&g, i, (unsigned) s[si]);
+			if ((size_t) s[si] == i) break;
+			t_edges.push_back(
+					std::pair<size_t, size_t>(i, (size_t) s[si]));
 		}
 	}
+/*
 	std::ostringstream os;
 	size_t digit = (size_t) log10(vertex_count);
 	os << std::setfill('0') << std::setw(digit) << vertex_id;
@@ -294,11 +271,13 @@ flip_graph_generator::write_triangulation_graph(size_t vertex_id) const
 	igraph_write_graph_gml(&g, fp, 0, 0);
 	fclose(fp);
 	igraph_destroy(&g);
+	*/
 }
 
 /**
  *
  */
+ /*
 void
 flip_graph_generator::save(const std::string& filename) const
 {
@@ -306,14 +285,17 @@ flip_graph_generator::save(const std::string& filename) const
 	igraph_write_graph_gml(&flip_graph, fp, 0, 0);
 	fclose(fp);
 }
+*/
 
-/**
+/** 
  *
  */
+ /*
 void flip_graph_generator::get_flip_graph(igraph_t& g)
 {
 	g = flip_graph;
 }
+*/
 
 /** Get the vertex set of caliculated flip graph. The vertex set is
  * represented as a vector of strings. Each index of vector is a id of
@@ -321,7 +303,43 @@ void flip_graph_generator::get_flip_graph(igraph_t& g)
  * is able to decode to triangulation of convex polygons.
  * @param v stored the vertex set.
  */
-void flip_graph_generator::get_vertices(std::vector<std::string>& v)
+void flip_graph_generator::get_vertices(std::vector<std::string>& v) const
 {
 	v = vertices;
 }
+
+
+/** 
+ *
+ */
+void flip_graph_generator::get_edges(
+		std::vector<std::pair<size_t, size_t> >& E) const
+{
+	E = edges;
+}
+
+/** 
+ *
+ */
+void flip_graph_generator::get_ref_table(
+		std::map<std::string, size_t>& ref_table) const
+{
+	ref_table = dss_id_ref_tab;
+}
+
+/** 
+ *
+ */
+size_t flip_graph_generator::get_vertex_count() const
+{
+	return vertex_count;
+}
+
+/** 
+ *
+ */
+size_t flip_graph_generator::get_polygon_vertex_count() const
+{
+	return polygon_vertex_count;
+}
+
