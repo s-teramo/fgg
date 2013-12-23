@@ -1,9 +1,9 @@
 CC = g++
 IGRAPH_INCLUDE_PATH = /opt/local/include
-CFLAGS = -O2 -Wall -I.. -I$(IGRAPH_INCLUDE_PATH) 
+CFLAGS = -O2 -Wall -I../.. -I$(IGRAPH_INCLUDE_PATH) 
 LD = g++
 IGRAPH_LIBRARY_PATH = /opt/local/lib
-LFLAGS = -O2 -L.. -L$(IGRAPH_LIBRARY_PATH)
+LFLAGS = -O2 -L../.. -L$(IGRAPH_LIBRARY_PATH)
 LIBS = -lfgg -ligraph
 
 .SUFFIXES:
