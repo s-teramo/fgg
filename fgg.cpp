@@ -5,12 +5,11 @@
 #include <iostream>
 #include <stack>
 
-
 /** Constructor of flip_graph_generator. Initializing the number of
  * polygon_vertex_count and vertex_count.
  * @param n the number of vertices of a target convex polygon
  */
-flip_graph_generator::flip_graph_generator(size_t n) :
+flip_graph_generator::flip_graph_generator(size_t n = 6) :
 		polygon_vertex_count(n), vertex_count(0)
 {
 	assert(n > 2);
@@ -102,8 +101,13 @@ flip_graph_generator::concatenate(const std::vector<std::string>& splits,
 	return concat_string;
 }
 
-/**
- *
+/** Generate neighbor Davenport-Schinzel sequence from the j-th word
+ * in the i-th subsequence. Note that the j-th word is at the last
+ * in the i-th subsequence.
+ * @param neighbor_vec
+ * @param split_strings
+ * @param ith_dec_seq
+ * @param jth_word
  */
 void
 flip_graph_generator::neighbor_dss_from_last_word(
@@ -133,8 +137,13 @@ flip_graph_generator::neighbor_dss_from_last_word(
 			s1, ith_dec_seq, s2, swap_pos2));
 }
 
-/**
- *
+/** Generate neighbor Davenport-Schinzel sequence from the j-th word
+ * in the i-th subsequence. Note that the j-th word is not at the last
+ * in the i-th subsequence.
+ * @param neighbor_vec
+ * @param split_strings
+ * @param ith_dec_seq
+ * @param jth_word
  */
 void
 flip_graph_generator::neighbor_dss_from_not_last_word(
@@ -166,8 +175,16 @@ flip_graph_generator::neighbor_dss_from_not_last_word(
 			s2, (unsigned) pred - 1, s1, ith_dec_seq));
 }
 
-/**
- *
+/** Get neighbors of given Davenport-Schinzel sequence.
+ * For each subsequence, all alphabets excluded the first and the last
+ * in the last subsequence can be the neighbors. For each neighbor alphabet,
+ * according to the position in the subsequence, we call difference procedures;
+ * neighbor_dss_from_last_word and neighbor_dss_from_not_last_word.
+ * If a neighbor alphabet is not the last, we can easily find the pair of
+ * vertices that forms the new diagonal after flipping. Otherwise, we have to
+ * seek in the succeeding subsequence.
+ * @param dss an input string of a Davenport-Schinzel sequence.
+ * @param S stored strings of neighbors of dss.
  */
 void
 flip_graph_generator::get_neighbors(const std::string& dss, 
@@ -181,25 +198,22 @@ flip_graph_generator::get_neighbors(const std::string& dss,
 		if (splits[i].size() == 1) {
 			continue;
 		}
-		for (size_t j = 1; j < splits[i].size(); j++) {
-			if (i == splits.size() - 1 && j == splits[i].size() - 1) {
-				break;
-			}
-			if (j == splits[i].size() - 1) {
-				neighbor_dss_from_last_word(S, splits, i, j);
-			} else {
-				neighbor_dss_from_not_last_word(S, splits, i, j);
-			}
+		for (size_t j = 1; j < splits[i].size() - 1; j++) {
+			neighbor_dss_from_not_last_word(S, splits, i, j);
+		}
+		if (i != splits.size() - 1) {
+			neighbor_dss_from_last_word(S, splits, i, splits[i].size() - 1);
 		}
 	}
 }
 
-/**
- *
+/** Generate each triangulation or vertex and each edge of the flip
+ * graph.
  */
 void
 flip_graph_generator::gen()
 {
+	if (! vertices.empty()) return;
 	std::string init_dss = get_init_dss();
 	vertices.push_back(init_dss);
 
@@ -240,11 +254,13 @@ flip_graph_generator::gen()
 			}
 		}
 	}
-//	build_flip_graph();
 }
 
-/**
- *
+/** Get edges of the triangulation induced from a given Davenport-Schinzel
+ * sequence.
+ * @param vertex_id input Davenport-Schinzel sequence.
+ * @param t_edges stored all edges including the polygon edges and
+ *                the diagonals.
  */
 void
 flip_graph_generator::get_triangulation_edges(const size_t& vertex_id,
@@ -262,40 +278,8 @@ flip_graph_generator::get_triangulation_edges(const size_t& vertex_id,
 					std::pair<size_t, size_t>(i, (size_t) s[si]));
 		}
 	}
-/*
-	std::ostringstream os;
-	size_t digit = (size_t) log10(vertex_count);
-	os << std::setfill('0') << std::setw(digit) << vertex_id;
-	std::string fname = "triangulation-" + os.str() + ".gml";
-	FILE* fp = fopen(fname.c_str(), "w");
-	igraph_write_graph_gml(&g, fp, 0, 0);
-	fclose(fp);
-	igraph_destroy(&g);
-	*/
 }
 
-/**
- *
- */
- /*
-void
-flip_graph_generator::save(const std::string& filename) const
-{
-	FILE *fp  = fopen(filename.c_str(), "w");
-	igraph_write_graph_gml(&flip_graph, fp, 0, 0);
-	fclose(fp);
-}
-*/
-
-/** 
- *
- */
- /*
-void flip_graph_generator::get_flip_graph(igraph_t& g)
-{
-	g = flip_graph;
-}
-*/
 
 /** Get the vertex set of caliculated flip graph. The vertex set is
  * represented as a vector of strings. Each index of vector is a id of
@@ -309,8 +293,9 @@ void flip_graph_generator::get_vertices(std::vector<std::string>& v) const
 }
 
 
-/** 
- *
+/** Get the reference to the vector data structure that stores the
+ * all edges of the flip graph.
+ * @param E assigined the reference of vector storing flip graph edges.
  */
 void flip_graph_generator::get_edges(
 		std::vector<std::pair<size_t, size_t> >& E) const
@@ -318,8 +303,11 @@ void flip_graph_generator::get_edges(
 	E = edges;
 }
 
-/** 
- *
+/** Get the reference to the map data structure that stores the
+ * relationships between Davenport-Schinzel sequence and vertex
+ * identification of the flip graph.
+ * @param ref_table stored the reference to relationships of a sequence
+ *        and a vertex.
  */
 void flip_graph_generator::get_ref_table(
 		std::map<std::string, size_t>& ref_table) const
@@ -327,16 +315,14 @@ void flip_graph_generator::get_ref_table(
 	ref_table = dss_id_ref_tab;
 }
 
-/** 
- *
+/** Get the number of vertices of the flip graph.
  */
 size_t flip_graph_generator::get_vertex_count() const
 {
 	return vertex_count;
 }
 
-/** 
- *
+/** Get the number of polygon vertices.
  */
 size_t flip_graph_generator::get_polygon_vertex_count() const
 {

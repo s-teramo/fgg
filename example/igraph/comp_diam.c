@@ -30,7 +30,7 @@ build_flip_graph(const size_t& v_count,
 void dump_tri(flip_graph_generator& fgg, const size_t& v_id) 
 {
 	std::vector<std::pair<size_t, size_t> > te;
-	fgg.get_triangulation_edges(fgg.get_polygon_vertex_count(), te);
+	fgg.get_triangulation_edges(v_id, te);
 
 	igraph_t tg;
 	build_flip_graph(fgg.get_polygon_vertex_count(), te, tg);
