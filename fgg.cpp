@@ -176,13 +176,14 @@ flip_graph_generator::neighbor_dss_from_not_last_word(
 }
 
 /** Get neighbors of given Davenport-Schinzel sequence.
- * For each subsequence, all alphabets excluded the first and the last
- * in the last subsequence can be the neighbors. For each neighbor alphabet,
- * according to the position in the subsequence, we call difference procedures;
+ * All alphabets excluded the first one for each subsequence and the last
+ * of the last subsequence can be the neighbors. This is because these
+ * excluded alphabets are polygon edges. For each diagonal alphabet, according
+ * to the position in the subsequence, we call difference procedures;
  * neighbor_dss_from_last_word and neighbor_dss_from_not_last_word.
- * If a neighbor alphabet is not the last, we can easily find the pair of
- * vertices that forms the new diagonal after flipping. Otherwise, we have to
- * seek in the succeeding subsequence.
+ * If a diagonal alphabet is not the last of the subsequence, we can easily
+ * find the pair of vertices that forms new diagonal after flipping.
+ * Otherwise, we have to seek in the succeeding subsequence.
  * @param dss an input string of a Davenport-Schinzel sequence.
  * @param S stored strings of neighbors of dss.
  */
@@ -293,8 +294,8 @@ void flip_graph_generator::get_vertices(std::vector<std::string>& v) const
 }
 
 
-/** Get the reference to the vector data structure that stores the
- * all edges of the flip graph.
+/** Get the reference to the vector data structure that stores all the edges
+ * of the flip graph.
  * @param E assigined the reference of vector storing flip graph edges.
  */
 void flip_graph_generator::get_edges(
